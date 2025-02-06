@@ -10,3 +10,18 @@ a {
 .listaRachunkow > li {
   color: darkslategray;
 }
+
+.header {
+  margin: 0 auto;
+  background: chartreuse;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+.footer {
+  margin: 0 auto;
+  background: chartreuse;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
