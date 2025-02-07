@@ -1,0 +1,15 @@
+extends layout
+
+block content
+    h1 Rejestracja
+    form(action='/signup' method='post')
+        section
+            label(for='username') Nazwa użytkownika
+            input(id='username' name='username' type='text' autocomplete='username' required autofocus)
+        section
+            label(for='email') Adres e-mail
+            input(id='email' name='email' type='text' autocomplete='email' required)
+        section
+            label(for='current-password') Hasło
+            input(id='current-password' name='password' type='password' autocomplete='current-password' required)
+        button(type='submit') Zarejestruj się

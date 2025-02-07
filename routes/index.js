@@ -29,12 +29,10 @@ const getGlobalInfo = function(req, res, next) {
 }
 
 /* GET home page. */
-router.get('/', getGlobalInfo, function(req, res) {
-  res.render('index', { global_info: req.global_info });
+router.get('/', function(req, res) {
+  console.log('Home page, user:', req.user);
+  console.log('Authenticated:', req.isAuthenticated());
+  res.render('index', {authentication: req.isAuthenticated(), user: req.user });
 });
-
-router.get('/rachunki', getGlobalInfo, getListaRachunkow, function(req, res) {
-  res.render('rachunki', { global_info: req.global_info, rachunki: req.rachunki });
-})
 
 module.exports = router;

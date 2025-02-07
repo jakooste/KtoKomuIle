@@ -1,4 +1,15 @@
 extends layout
 
 block content
-  a(href="/rachunki") Lista rachunków
+  if authentication
+    h1 Witaj w serwisie, #{user.username}!
+  else
+    h1 Zaloguj się, aby korzystać z serwisu
+  ul
+    li
+      a(href="/login") Logowanie
+    li
+      a(href="/signup") Rejestracja
+    li
+      form(action='/logout' method='post')
+        button(type='submit') Wyloguj

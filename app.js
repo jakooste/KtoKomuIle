@@ -1,13 +1,32 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const session = require('express-session');
+const mysqlStore = require('express-mysql-session')(session);
+const mysql = require('mysql2');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
+const authRouter = require('./routes/auth');
+const passport = require("passport");
 
-var app = express();
+const app = express();
+
+DB_HOST = 'localhost';
+DB_USER = 'nowy_user';
+DB_PASSWORD = 'haslo';
+DB_DATABASE = 'ktokomuiledb';
+
+const connection = mysql.createConnection({
+  host: DB_HOST,
+  user: DB_USER,
+  password: DB_PASSWORD,
+  database: DB_DATABASE,
+  charset: 'utf8mb4'
+})
+const sessionStore = new mysqlStore({}, connection);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -19,8 +38,33 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(passport.initialize());
+app.use(session({
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: false,
+    store: sessionStore,
+    //cookie: { secure: true }
+}));
+app.use(passport.authenticate('session'));
+
+passport.serializeUser(function(user, cb) {
+    console.log('serializeUser:', user);
+    process.nextTick(function() {
+        cb(null, { id: user.id, username: user.username });
+    });
+});
+
+passport.deserializeUser(function(user, cb) {
+    console.log('deserializeUser:', user);
+    process.nextTick(function() {
+        return cb(null, user);
+    });
+});
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/', authRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
