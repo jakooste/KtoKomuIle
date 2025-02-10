@@ -1,0 +1,7 @@
+extends layout
+
+block content
+    form(action='/home/new/' method='post')
+        label(for='nazwa') Nazwa rachunku:
+        input(id='nazwa', type='text', name='nazwa', required)
+        button(type='submit') Dodaj

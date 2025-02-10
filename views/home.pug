@@ -1,5 +1,12 @@
 extends layout
 
 block content
-    h1 Witaj w serwisie KtoKomuIle, #{user}!
-    button(onclick='/logout') Wyloguj
+    h1 Witaj w serwisie KtoKomuIle, #{user.username}!
+    h2 Lista twoich rachunków:
+    ul
+        each rachunek in rachunki
+            li <a href='/rachunek?id=#{rachunek.idRachunek}'>#{rachunek.nazwa}</a>
+    div
+        a(href='/home/new') Dodaj nowy rachunek
+    div
+        include components/logoutButton
