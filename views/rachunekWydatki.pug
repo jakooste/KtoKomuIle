@@ -1,0 +1,11 @@
+extends rachunek
+
+block karta
+    h2 Lista wydatków:
+        ol
+            each wydatek in wydatki
+                li
+                    div.wyd
+                        p #{wydatek.kto}
+                        p= wydatek.kwota + wydatek.waluta
+                        p= wydatek.kiedy.toDateString()

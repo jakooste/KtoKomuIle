@@ -5,7 +5,7 @@ block content
     h2 Lista twoich rachunków:
     ul
         each rachunek in rachunki
-            li <a href='/rachunek?id=#{rachunek.idRachunek}'>#{rachunek.nazwa}</a>
+            li <a href='/rachunek/#{rachunek.idRachunek}'>#{rachunek.nazwa}</a>
     div
         a(href='/home/new') Dodaj nowy rachunek
     div

@@ -1,0 +1,6 @@
+extends layout
+
+block content
+    h1 Rachunek: #{rachunek.nazwa}
+    a(href=('/rachunek/'+rachunek.idRachunek+'/wydatki')) <button>Wydatki</button>
+    block karta
