@@ -15,36 +15,7 @@ const getListaRachunkow = function(req, res, next) {
     next()
   })
 }
-const authRachunekAccess = function (req, res, next) {
-  db.connect();
-  console.log('Authorising access to Rachunek', req.params.idRachunek);
-  const zapytanie2 = `SELECT * FROM Rachunek WHERE idRachunek = ? AND tworca_id = ?`;
-  db.query(zapytanie2, [req.params.idRachunek, req.user.id], function(err, results) {
-    console.log('Znaleziony rachunek: ', results[0]);
-    if (err) {
-      console.log('Error in authRachunekAccess:', err);
-      return res.status(500).send('Database error');
-    }
-    req.isRachunekAuthenthicated = results.length > 0;
-    if (!req.isRachunekAuthenthicated) {
-      res.redirect('/rachunek/'+ req.params.idRachunek + '/notfound');
-    }
-    req.rachunek = results[0];
-    next();
-  })
-}
-const getListaWydatkow = function (req, res, next) {
-  db.connect();
-  const zapytanie = `SELECT * FROM Wydatki WHERE idRachunek = ?`;
-  db.query(zapytanie, [req.params.idRachunek], function(err, results) {
-    if (err) {
-      console.error('Error in getListaWydatkow:', err);
-      return res.status(500).send('Database error');
-    }
-    req.wydatki = results;
-    next();
-  })
-}
+
 
 /* GET home page. */
 router.get('/', function(req, res) {
@@ -81,8 +52,8 @@ router.post('/home/new', function(req, res) {
   })
 })
 
-router.get('/rachunek/:idRachunek', function(req, res) {
-  res.redirect('/rachunek/' + req.params.idRachunek + '/wydatki');
+/*router.get('/rachunek/:idRachunek', function(req, res) {
+  res.location('/rachunek/' + req.params.idRachunek + '/wydatki');
 })
 
 router.get('/rachunek/:idRachunek/wydatki/', authRachunekAccess, getListaWydatkow, function(req, res) {
@@ -93,6 +64,6 @@ router.get('/rachunek/:idRachunek/wydatki/', authRachunekAccess, getListaWydatko
 
 router.get('/rachunek/:idRachunek/notfound', function(req, res) {
   res.render('notfoundRachunek');
-})
+})*/
 
 module.exports = router;

@@ -1,0 +1,11 @@
+extends rachunek
+
+block karta
+    h2 Lista członków:
+    ul
+        each czlonek in czlonkowie
+            li
+                div.czl
+                    p= czlonek.pseudonim
+                    p= czlonek.czyWirtualny ? 'wirtualny' : 'użytkownik'
+                    p= czlonek.bilans.toFixed(2)

@@ -3,4 +3,5 @@ extends layout
 block content
     h1 Rachunek: #{rachunek.nazwa}
     a(href=('/rachunek/'+rachunek.idRachunek+'/wydatki')) <button>Wydatki</button>
+    a(href=('/rachunek/'+rachunek.idRachunek+'/czlonkowie')) <button>Czlonkowie</button>
     block karta

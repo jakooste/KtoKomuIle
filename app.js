@@ -6,27 +6,15 @@ const logger = require('morgan');
 const session = require('express-session');
 const mysqlStore = require('express-mysql-session')(session);
 const mysql = require('mysql2');
+const passport = require('passport');
+const db = require('./db');
 
 const indexRouter = require('./routes/index');
-const usersRouter = require('./routes/users');
 const authRouter = require('./routes/auth');
-const passport = require("passport");
+const rachunekRouter = require('./routes/rachunek');
 
 const app = express();
-
-DB_HOST = 'localhost';
-DB_USER = 'nowy_user';
-DB_PASSWORD = 'haslo';
-DB_DATABASE = 'ktokomuiledb';
-
-const connection = mysql.createConnection({
-  host: DB_HOST,
-  user: DB_USER,
-  password: DB_PASSWORD,
-  database: DB_DATABASE,
-  charset: 'utf8mb4'
-})
-const sessionStore = new mysqlStore({}, connection);
+const sessionStore = new mysqlStore({}, db);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -63,8 +51,8 @@ passport.deserializeUser(function(user, cb) {
 });
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
 app.use('/', authRouter);
+app.use('/rachunek', rachunekRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
