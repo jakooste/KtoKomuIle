@@ -1,10 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const mysql = require('mysql2');
 const db = require('../db');
 
 const logger = function (req, res, next) {
-    console.log('Params:', req.params);
     next();
 }
 
@@ -20,12 +18,14 @@ const authRead = function (req, res, next) {
         req.authRead = results.length > 0;
         if(!req.authRead) {
             console.log('User not allowed to read this Rachunek');
-            res.render('notfoundRachunek');
-            res.end();
+            next();
         }
-        console.log('User allowed to read, results:', results);
-        req.rachunek = {nazwa: results[0].nazwa, idRachunek: results[0].idRachunek};
-        next();
+        else
+        {
+            console.log('User allowed to read, results:', results);
+            req.rachunek = {nazwa: results[0].nazwa, idRachunek: results[0].idRachunek};
+            next();
+        }
     })
 }
 
@@ -64,7 +64,6 @@ const getCzlonkowie = function (req, res, next) {
             console.error('Error in getCzlonkowie:', err);
             return res.status(500).send('Database error');
         }
-        console.log('getCzlonkowie query results:', results);
         req.czlonkowie = {};
         for (let row of results) {
             req.czlonkowie[row.idCzlonek] = {
@@ -75,7 +74,6 @@ const getCzlonkowie = function (req, res, next) {
                 bilans: 0
             };
         }
-        console.log('getCzlonkowie processing results:', req.czlonkowie);
         next();
     });
 }
@@ -107,13 +105,76 @@ const getBilans = function (req, res, next) {
                     kwota = wpis.wartosc;
                     break;
             }
-            console.log(kwota);
             req.czlonkowie[wpis.kto_idCzlonek].bilans += kwota;
             req.czlonkowie[wpis.winny_idCzlonek].bilans -= kwota;
         }
-        console.log('getBilans processing results:', req.czlonkowie);
         next();
     });
+}
+
+const getWaluty = function (req, res, next) {
+    db.connect();
+    const zapytanie = `SELECT * FROM Waluta`;
+    db.query(zapytanie, function(err, results) {
+        if (err) {
+            console.error('Error in getWaluty');
+            return res.status(500).send('Database error');
+        }
+        //console.log(results);
+        req.waluty = results;
+        next();
+    })
+}
+
+const getRodzajePodzialu = function (req, res, next) {
+    db.connect();
+    const zapytanie = `SELECT * FROM RodzajPodzialu`;
+    db.query(zapytanie, function(err, results) {
+        if (err) {
+            console.error('Error in getRodzajePodzialu');
+            return res.status(500).send('Database error');
+        }
+        //console.log(results);
+        req.rodzajePodzialu = results;
+        next();
+    })
+}
+
+const insertWydatek = function (req, res, next) {
+    //console.log('POSTing new wydatek:', req.body);
+    db.connect();
+    const zapytanie = `INSERT INTO Wpis(idRachunek, kto_id, idWaluta, kwota, idRodzajPodzialu, data, wpis) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+    db.query(zapytanie, [req.params.idRachunek, req.body.kto_idCzlonek, req.body.idWaluta, req.body.kwota, req.body.idRodzajPodzialu, req.body.data, req.body.wpis], function(err, results) {
+        if(err){
+            console.error('Error in insertWydatek');
+            return res.status(500).send('Database error');
+        }
+        //console.log(results.insertId);
+        const idWpis = results['insertId'];
+        const zapytanie2 = `INSERT INTO PoleWpisu(idWpis, idCzlonek, wartosc) VALUES ?`;
+
+        let values = [];
+        let czlonkowie = Object.entries(req.czlonkowie)
+        //console.log('czlonkowie:', czlonkowie);
+        for (let czlonek of czlonkowie) {
+            if(('czlonek'+czlonek[0]) in req.body) {
+                values.push([
+                    idWpis,
+                    czlonek[1].idCzlonek,
+                    (req.body.idRodzajPodzialu === '1') ? 0 : req.body['czlonek'+czlonek[0]]]);
+            }
+        }
+        //console.log(values);
+        db.query(zapytanie2, [values], function(err) {
+            if(err){
+                console.error('Error in insertWydatek(2)');
+                return res.status(500).send('Database error');
+            }
+            //console.log(results);
+            next();
+        })
+    })
+
 }
 
 router.use(logger);
@@ -123,11 +184,31 @@ router.param('idRachunek', authWrite);
 
 router.route('/:idRachunek/wydatki')
     .get(getWydatki, function(req, res) {
-        res.render('rachunekWydatki', {
+        if (req.authRead) {
+            res.render('rachunekWydatki', {
+                authWrite: req.authWrite,
+                rachunek: req.rachunek,
+                wydatki: req.wydatki
+            });
+        }
+        else {
+            res.render('notfoundRachunek');
+        }
+
+    });
+
+router.route('/:idRachunek/nowy_wydatek')
+    .get(getCzlonkowie, getWaluty, getRodzajePodzialu, function(req, res) {
+        res.render('addWydatek', {
             authWrite: req.authWrite,
             rachunek: req.rachunek,
-            wydatki: req.wydatki
+            czlonkowie: req.czlonkowie,
+            waluty: req.waluty,
+            rodzajePodzialu: req.rodzajePodzialu,
         });
+    })
+    .post(getCzlonkowie, insertWydatek, getWydatki, function(req, res) {
+        res.redirect('/'+req.params.idRachunek+'/wydatki');
     });
 
 router.route('/:idRachunek/czlonkowie')

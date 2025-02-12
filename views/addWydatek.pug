@@ -1,0 +1,42 @@
+extends layout
+
+block content
+    h1 Nowy wydatek
+    form(action='/rachunek/'+rachunek.idRachunek+'/nowy_wydatek', method='post')
+        div
+            label(for='rachunek') Rachunek:
+            select(id='rachunek', name='idRachunek', disabled)
+                option(value=rachunek.idRachunek)= rachunek.nazwa
+        div
+            label(for='nazwa') Nazwa wpisu:
+            input(id='nazwa' name='wpis' required)
+        div
+            label(for='kto') Kto zapłacił:
+            select(id='kto', name='kto_idCzlonek', required)
+                each czlonek in czlonkowie
+                    option(value=czlonek.idCzlonek)= czlonek.pseudonim
+        div
+            label(for='kwota') Kwota:
+            input(id='kwota', name='kwota', type='number', value=0, required)
+            select(id='waluta', name='idWaluta', required)
+                each waluta in waluty
+                    option.waluta_option(value=waluta.idWaluta)= waluta.waluta
+        div
+            label(for='data') Data:
+            input(id='data', name='data', type='date', value=(new Date()).toDateString(), required)
+        div
+            div
+                label(for='rodzaj') Rodzaj podziału:
+                select(id='rodzaj', name='idRodzajPodzialu', required)
+                    each rodzaj in rodzajePodzialu
+                        option(value=rodzaj.idRodzajPodzialu)= rodzaj.rodzajPodzialu
+            div
+                each czlonek in czlonkowie
+                    div
+                        label(for='czlonek'+czlonek.idCzlonek)= czlonek.pseudonim
+                        input.pole_input(type='checkbox', id='czlonek'+czlonek.idCzlonek, name='czlonek'+czlonek.idCzlonek)
+                        span.pole_label
+
+        div
+            button Dodaj
+        script(src='/javascripts/addRachunekLogic.js')
