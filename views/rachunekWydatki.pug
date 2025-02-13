@@ -2,6 +2,8 @@ extends rachunek
 
 block karta
     h2 Lista wydatków:
+    if authWrite
+        a(href='/rachunek/' + rachunek.idRachunek + '/nowy_wydatek') <button>Nowy wydatek</button>
     ol
         each wydatek in wydatki
             li
@@ -10,5 +12,3 @@ block karta
                     p= wydatek.kto
                     p= wydatek.kwota + wydatek.waluta
                     p= wydatek.kiedy.toDateString()
-    if authWrite
-        a(href='/rachunek/'+rachunek.idRachunek+'/nowy_wydatek') <button>Nowy wydatek</button>

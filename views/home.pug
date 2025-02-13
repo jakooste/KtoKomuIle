@@ -7,6 +7,6 @@ block content
         each rachunek in rachunki
             li <a href='/rachunek/#{rachunek.idRachunek}/wydatki'>#{rachunek.nazwa}</a>
     div
-        a(href='/home/new') Dodaj nowy rachunek
+        a(href='/home/new') <button>Dodaj nowy rachunek</button>
     div
         include components/logoutButton

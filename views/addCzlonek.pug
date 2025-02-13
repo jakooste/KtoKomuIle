@@ -1,0 +1,22 @@
+extends layout
+
+block content
+    if authWrite
+        h1 Nowy członek
+        div
+            h3 Podaj login użytkownika, którego chcesz dodać:
+            form(action='/rachunek/'+rachunek.idRachunek+'/nowy_czlonek' method='post')
+                label(for='nazwa_uzytkownik') Login:
+                input(type='text' id='nazwa_uzytkownik' name='login' required)
+                button(type='submit') Dodaj
+        div
+            p --- lub ---
+        div
+            h3 Dodaj członka nie będącego użytkownikiem:
+            form(action='/rachunek/'+rachunek.idRachunek+'/nowy_czlonek' method='post')
+                label(for='nazwa_wirtualny') Nazwa:
+                input(type='text' id='nazwa_wirtualny' name='pseudonim' required)
+                button(type='submit') Dodaj
+    else
+        h1 Brak dostępu
+        p Tylko twórca rachunku może dodawać do niego członków.

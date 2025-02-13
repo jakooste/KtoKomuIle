@@ -45,7 +45,7 @@ const authWrite = function (req, res, next) {
 
 const getWydatki = function (req, res, next) {
     db.connect();
-    const zapytanie = `SELECT * FROM Wydatki WHERE idRachunek = ?`;
+    const zapytanie = `SELECT * FROM Wydatki WHERE idRachunek = ? ORDER BY kiedy DESC`;
     db.query(zapytanie, [req.params.idRachunek], function(err, results) {
         if (err) {
             console.error('Error in getListaWydatkow:', err);
@@ -66,7 +66,7 @@ const getCzlonkowie = function (req, res, next) {
         }
         req.czlonkowie = {};
         for (let row of results) {
-            req.czlonkowie[row.idCzlonek] = {
+            req.czlonkowie[row['idCzlonek']] = {
                 idCzlonek: row.idCzlonek,
                 czyWirtualny: row.czyWirtualny,
                 idUzytkownik: row.idUzytkownik,
@@ -74,6 +74,7 @@ const getCzlonkowie = function (req, res, next) {
                 bilans: 0
             };
         }
+        console.log('uzyskano listę członków');
         next();
     });
 }
@@ -177,6 +178,34 @@ const insertWydatek = function (req, res, next) {
 
 }
 
+const insertCzlonek = function (req, res, next) {
+    db.connect();
+    if('login' in req.body) {
+        let name = req.body['login'];
+        const zapytanie = `CALL dodaj_czlonka_uzytkownika(?, ?)`;
+        db.query(zapytanie, [req.rachunek.idRachunek, name], function(err) {
+            if(err){
+                console.error('Error in insertCzlonek-uzytkownik');
+                return res.status(500).send('Database error');
+            }
+            console.log('dodano czlonka uzytkownika');
+            next();
+        })
+    }
+    else {
+        let name = req.body['pseudonim'];
+        const zapytanie = `CALL dodaj_czlonka_wirtualnego(?, ?)`;
+        db.query(zapytanie, [req.rachunek.idRachunek, name], function(err) {
+            if(err){
+                console.error('Error in insertCzlonek-wirtualny');
+                return res.status(500).send('Database error');
+            }
+            console.log('dodano czlonka wirtualnego');
+            next();
+        })
+    }
+}
+
 router.use(logger);
 
 router.param('idRachunek', authRead);
@@ -208,7 +237,7 @@ router.route('/:idRachunek/nowy_wydatek')
         });
     })
     .post(getCzlonkowie, insertWydatek, getWydatki, function(req, res) {
-        res.redirect('/'+req.params.idRachunek+'/wydatki');
+        res.redirect('/rachunek/'+req.params.idRachunek+'/wydatki');
     });
 
 router.route('/:idRachunek/czlonkowie')
@@ -220,5 +249,12 @@ router.route('/:idRachunek/czlonkowie')
        });
     });
 
+router.route('/:idRachunek/nowy_czlonek')
+    .get(getCzlonkowie, function (req, res) {
+        res.render('addCzlonek', {authRead: req.authRead, authWrite: req.authWrite, rachunek: req.rachunek});
+    })
+    .post(insertCzlonek, getCzlonkowie, getBilans, function(req, res) {
+        res.redirect('/rachunek/'+req.params.idRachunek+'/czlonkowie');
+    })
 
 module.exports = router;

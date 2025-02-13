@@ -2,6 +2,8 @@ extends rachunek
 
 block karta
     h2 Lista członków:
+    if authWrite
+        a(href='/rachunek/' + rachunek.idRachunek + '/nowy_czlonek') <button>Dodaj członka</button>
     ul
         each czlonek in czlonkowie
             li
