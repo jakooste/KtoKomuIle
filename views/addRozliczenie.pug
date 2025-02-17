@@ -1,0 +1,31 @@
+extends layout
+
+block content
+    h1 Nowe rozliczenie
+    p.warning Uwaga! Aplikacja nie wykonuje transferu pieniędzy - służy wyłącznie do notowania.
+    form(action='/rachunek/'+rachunek.idRachunek+'/nowe_rozliczenie', method='post')
+        div
+            label(for='rachunek') Rachunek:
+            select(id='rachunek', name='idRachunek', disabled)
+                option(value=rachunek.idRachunek)= rachunek.nazwa
+        div
+            label(for='kto') Kto oddaje:
+            select(id='kto', name='kto_idCzlonek', required)
+                each czlonek in czlonkowie
+                    option(value=czlonek.idCzlonek)= czlonek.pseudonim
+        div
+            label(for='komu') Komu oddaje:
+            select(id='komu', name='komu_idCzlonek', required)
+                each czlonek in czlonkowie
+                    option(value=czlonek.idCzlonek)= czlonek.pseudonim
+        div
+            label(for='kwota') Kwota:
+            input(id='kwota', name='kwota', type='number', value=0, required)
+            select(id='waluta', name='idWaluta', required)
+                each waluta in waluty
+                    option.waluta_option(value=waluta.idWaluta)= waluta.waluta
+        div
+            label(for='data') Data:
+            input(id='data', name='data', type='date', value=(new Date()).toDateString(), required)
+        div
+            button Dodaj

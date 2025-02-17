@@ -1,0 +1,14 @@
+extends rachunek
+
+block karta
+    h2 Lista członków:
+    if authWrite
+        a(href='/rachunek/' + rachunek.idRachunek + '/nowe_rozliczenie') <button>Dodaj rozliczenie</button>
+    ul
+        each rozliczenie in rozliczenia
+            div.rekord
+                span= rozliczenie.kto
+                span oddaje
+                span= rozliczenie.komu
+                span= rozliczenie.kwota + ' ' + rozliczenie.waluta
+                span= rozliczenie.data.toDateString()

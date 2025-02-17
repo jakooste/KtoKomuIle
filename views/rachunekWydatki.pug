@@ -4,11 +4,11 @@ block karta
     h2 Lista wydatków:
     if authWrite
         a(href='/rachunek/' + rachunek.idRachunek + '/nowy_wydatek') <button>Nowy wydatek</button>
-    ol
+    ul
         each wydatek in wydatki
             li
-                div.wyd
-                    p= wydatek.wpis
-                    p= wydatek.kto
-                    p= wydatek.kwota + wydatek.waluta
-                    p= wydatek.kiedy.toDateString()
+                div.rekord
+                    span= wydatek.wpis
+                    span= wydatek.kto
+                    span= wydatek.kwota + wydatek.waluta
+                    span= wydatek.kiedy.toDateString()
