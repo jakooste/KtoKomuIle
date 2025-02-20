@@ -1,11 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const mysql = require('mysql2');
 const db = require('../db');
 
 const getListaRachunkow = function(req, res, next) {
   db.connect();
-  const zapytanie = 'SELECT * FROM Rachunek WHERE tworca_id = ?';
+  const zapytanie = 'SELECT * FROM RachunekAuthRead WHERE idUzytkownik = ?';
   db.query(zapytanie, [req.user.id], function(err, results) {
     if (err) {
       console.error('Error in getListaRachunkow:', err);
@@ -16,8 +15,6 @@ const getListaRachunkow = function(req, res, next) {
   })
 }
 
-
-/* GET home page. */
 router.get('/', function(req, res) {
   console.log('Home page, user:', req.user);
   console.log('Authenticated:', req.isAuthenticated());
@@ -35,35 +32,31 @@ router.get('/', function(req, res) {
 router.get('/home', getListaRachunkow, function(req, res) {
   console.log('Home page, user:', req.user);
   console.log('Rachunki:', req.rachunki);
-  res.render('home', {user: req.user, rachunki: req.rachunki});
+  res.render('home', {
+    user: req.user,
+    isAuthenticated: req.isAuthenticated(),
+    rachunki: req.rachunki});
 })
 
 router.get('/home/new', function(req, res) {
-  res.render('addRachunek');
+  res.render('addRachunek', {
+    user: req.user,
+    isAuthenticated: req.isAuthenticated()
+  });
 })
 
-router.post('/home/new', function(req, res) {
+router.post('/home/new', getListaRachunkow, function(req, res) {
   console.log('Creating new Rachunek "' + req.body.nazwa +'"');
   db.connect();
-  const zapytanie = 'INSERT INTO Rachunek(tworca_id, nazwa) VALUES (?,?)';
-  db.query(zapytanie, [req.user.id, req.body.nazwa], function(err, results) {
+  const zapytanie = `CALL nowy_rachunek(?,?)`;
+  db.query(zapytanie, [req.body.nazwa, req.user.id], function(err) {
+    if (err) {
+      console.error('Error in nowy_rachunek:', err);
+      return res.status(500).send('Database error');
+    }
     console.log('Created');
     res.redirect('/home');
   })
 })
-
-/*router.get('/rachunek/:idRachunek', function(req, res) {
-  res.location('/rachunek/' + req.params.idRachunek + '/wydatki');
-})
-
-router.get('/rachunek/:idRachunek/wydatki/', authRachunekAccess, getListaWydatkow, function(req, res) {
-  console.log('Rachunek:', req.rachunek);
-  console.log('Wydatki:', req.wydatki);
-  res.render('rachunekWydatki', {user: req.user, rachunek: req.rachunek, wydatki: req.wydatki});
-})
-
-router.get('/rachunek/:idRachunek/notfound', function(req, res) {
-  res.render('notfoundRachunek');
-})*/
 
 module.exports = router;

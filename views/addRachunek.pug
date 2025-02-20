@@ -1,7 +1,10 @@
 extends layout
 
 block content
+    +backbutton('/home','wróć')
+    h1 Nowy rachunek
     form(action='/home/new/' method='post')
-        label(for='nazwa') Nazwa rachunku:
-        input(id='nazwa', type='text', name='nazwa', required)
-        button(type='submit') Dodaj
+        section
+            label(for='nazwa') Nazwa rachunku:
+            input(id='nazwa', type='text', name='nazwa', required)
+            button(type='submit') Dodaj

@@ -5,7 +5,6 @@ const db = require('../db');
 const logger = function (req, res, next) {
     next();
 }
-
 const authRead = function (req, res, next) {
     db.connect();
     console.log('Authorising read rights to Rachunek', req.params.idRachunek);
@@ -28,7 +27,6 @@ const authRead = function (req, res, next) {
         }
     })
 }
-
 const authWrite = function (req, res, next) {
     db.connect();
     console.log('Authorising write rights to Rachunek', req.params.idRachunek);
@@ -42,7 +40,6 @@ const authWrite = function (req, res, next) {
         next();
     })
 }
-
 const getWydatki = function (req, res, next) {
     db.connect();
     const zapytanie = `SELECT * FROM Wydatki WHERE idRachunek = ? ORDER BY kiedy DESC`;
@@ -55,7 +52,6 @@ const getWydatki = function (req, res, next) {
         next();
     })
 }
-
 const getCzlonkowie = function (req, res, next) {
     db.connect();
     const zapytanie = `SELECT * FROM Czlonkowie WHERE idRachunek = ?`;
@@ -78,7 +74,6 @@ const getCzlonkowie = function (req, res, next) {
         next();
     });
 }
-
 const getBilansWpisy = function (req, res, next) {
     db.connect();
     const zapytanie = `SELECT * FROM WydatkiDetails WHERE idRachunek = ?`;
@@ -114,7 +109,6 @@ const getBilansWpisy = function (req, res, next) {
         next();
     });
 }
-
 const getBilansRozliczenia = function (req, res, next) {
     db.connect();
     const zapytanie = `SELECT * FROM Rozliczenie JOIN Waluta ON Rozliczenie.idWaluta = Waluta.idWaluta WHERE idRachunek = ?`;
@@ -128,8 +122,6 @@ const getBilansRozliczenia = function (req, res, next) {
         }
         console.log(results);
         for (let rozliczenie of results) {
-            let kwota = 0;
-
             if(!(rozliczenie['waluta'] in req.czlonkowie[rozliczenie.kto_id].bilans)) req.czlonkowie[rozliczenie.kto_id].bilans[rozliczenie['waluta']] = 0;
             if(!(rozliczenie['waluta'] in req.czlonkowie[rozliczenie.komu_id].bilans)) req.czlonkowie[rozliczenie.komu_id].bilans[rozliczenie['waluta']] = 0;
             req.czlonkowie[rozliczenie.kto_id].bilans[rozliczenie['waluta']] += rozliczenie.kwota;
@@ -138,7 +130,6 @@ const getBilansRozliczenia = function (req, res, next) {
         next();
     });
 }
-
 const getRozliczenia = function (req, res, next) {
     db.connect();
     const zapytanie = `SELECT * FROM RozliczeniaDetails WHERE idRachunek = ?`;
@@ -151,7 +142,6 @@ const getRozliczenia = function (req, res, next) {
         next();
     })
 }
-
 const getWaluty = function (req, res, next) {
     db.connect();
     const zapytanie = `SELECT * FROM Waluta`;
@@ -165,7 +155,6 @@ const getWaluty = function (req, res, next) {
         next();
     })
 }
-
 const getRodzajePodzialu = function (req, res, next) {
     db.connect();
     const zapytanie = `SELECT * FROM RodzajPodzialu`;
@@ -179,84 +168,125 @@ const getRodzajePodzialu = function (req, res, next) {
         next();
     })
 }
-
 const insertWydatek = function (req, res, next) {
-    //console.log('POSTing new wydatek:', req.body);
-    db.connect();
-    const zapytanie = `INSERT INTO Wpis(idRachunek, kto_id, idWaluta, kwota, idRodzajPodzialu, data, wpis) VALUES (?, ?, ?, ?, ?, ?, ?)`;
-    db.query(zapytanie, [req.params.idRachunek, req.body.kto_idCzlonek, req.body.idWaluta, req.body.kwota, req.body.idRodzajPodzialu, req.body.data, req.body.wpis], function(err, results) {
-        if(err){
-            console.error('Error in insertWydatek');
-            return res.status(500).send('Database error');
-        }
-        //console.log(results.insertId);
-        const idWpis = results['insertId'];
-        const zapytanie2 = `INSERT INTO PoleWpisu(idWpis, idCzlonek, wartosc) VALUES ?`;
-
-        let values = [];
-        let czlonkowie = Object.entries(req.czlonkowie)
-        //console.log('czlonkowie:', czlonkowie);
-        for (let czlonek of czlonkowie) {
-            if(('czlonek'+czlonek[0]) in req.body) {
-                values.push([
-                    idWpis,
-                    czlonek[1].idCzlonek,
-                    (req.body.idRodzajPodzialu === '1') ? 0 : req.body['czlonek'+czlonek[0]]]);
-            }
-        }
-        //console.log(values);
-        db.query(zapytanie2, [values], function(err) {
-            if(err){
-                console.error('Error in insertWydatek(2)');
+    if(req.authWrite){
+        db.connect();
+        const zapytanie = `INSERT INTO Wpis(idRachunek, kto_id, idWaluta, kwota, idRodzajPodzialu, data, wpis) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+        db.query(zapytanie, [req.params.idRachunek, req.body.kto_idCzlonek, req.body.idWaluta, req.body.kwota, req.body.idRodzajPodzialu, req.body.data, req.body.wpis], function (err, results) {
+            if (err) {
+                console.error('Error in insertWydatek');
                 return res.status(500).send('Database error');
             }
-            //console.log(results);
-            next();
+            //console.log(results.insertId);
+            const idWpis = results['insertId'];
+            const zapytanie2 = `INSERT INTO PoleWpisu(idWpis, idCzlonek, wartosc) VALUES ?`;
+
+            let values = [];
+            let czlonkowie = Object.entries(req.czlonkowie)
+            //console.log('czlonkowie:', czlonkowie);
+            for (let czlonek of czlonkowie) {
+                if (('czlonek' + czlonek[0]) in req.body) {
+                    values.push([
+                        idWpis,
+                        czlonek[1].idCzlonek,
+                        (req.body.idRodzajPodzialu === '1') ? 0 : req.body['czlonek' + czlonek[0]]]);
+                }
+            }
+            //console.log(values);
+            db.query(zapytanie2, [values], function (err) {
+                if (err) {
+                    console.error('Error in insertWydatek(2)');
+                    return res.status(500).send('Database error');
+                }
+                //console.log(results);
+                next();
+            })
         })
-    })
-
+    }
+    else {
+        next();
+    }
 }
-
 const insertCzlonek = function (req, res, next) {
-    db.connect();
-    if('login' in req.body) {
-        let name = req.body['login'];
-        const zapytanie = `CALL dodaj_czlonka_uzytkownika(?, ?)`;
-        db.query(zapytanie, [req.rachunek.idRachunek, name], function(err) {
-            if(err){
-                console.error('Error in insertCzlonek-uzytkownik');
+    if(req.authWrite){
+        db.connect();
+        if ('login' in req.body) {
+            let name = req.body['login'];
+            const zapytanie = `CALL dodaj_czlonka_uzytkownika(?, ?)`;
+            db.query(zapytanie, [req.rachunek.idRachunek, name], function (err) {
+                if (err) {
+                    console.error('Error in insertCzlonek-uzytkownik');
+                    return res.status(500).send('Database error');
+                }
+                console.log('dodano czlonka uzytkownika');
+                next();
+            })
+        } else {
+            let name = req.body['pseudonim'];
+            const zapytanie = `CALL dodaj_czlonka_wirtualnego(?, ?)`;
+            db.query(zapytanie, [req.rachunek.idRachunek, name], function (err) {
+                if (err) {
+                    console.error('Error in insertCzlonek-wirtualny');
+                    return res.status(500).send('Database error');
+                }
+                console.log('dodano czlonka wirtualnego');
+                next();
+            })
+        }
+    }
+    else{
+        next();
+    }
+}
+const insertRozliczenie = function (req, res, next) {
+    if(req.authWrite){
+        console.log('Inserting new Rozliczenie:', req.body);
+        db.connect();
+        const zapytanie = `INSERT INTO Rozliczenie(idRachunek, kto_id, komu_id, idWaluta, kwota, data) VALUES (?, ?, ?, ?, ?, ?)`;
+        db.query(zapytanie, [req.params.idRachunek, req.body['kto_idCzlonek'], req.body['komu_idCzlonek'], req.body['idWaluta'], req.body['kwota'], req.body['data']], function (err, results) {
+            if (err) {
+                console.error('Error in insertRozliczenie');
                 return res.status(500).send('Database error');
             }
-            console.log('dodano czlonka uzytkownika');
+            console.log(results);
             next();
         })
     }
     else {
-        let name = req.body['pseudonim'];
-        const zapytanie = `CALL dodaj_czlonka_wirtualnego(?, ?)`;
-        db.query(zapytanie, [req.rachunek.idRachunek, name], function(err) {
+        next();
+    }
+}
+const deleteWydatek = function (req, res, next) {
+    if(req.authWrite) {
+        db.connect();
+        const zapytanie = `CALL usun_wydatek(?)`;
+        db.query(zapytanie, [req.params.idWydatek], function(err) {
             if(err){
-                console.error('Error in insertCzlonek-wirtualny');
+                console.error('Error in deleteWydatek');
                 return res.status(500).send('Database error');
             }
-            console.log('dodano czlonka wirtualnego');
             next();
         })
     }
-}
-
-const insertRozliczenie = function (req, res, next) {
-    console.log('Inserting new Rozliczenie:', req.body);
-    db.connect();
-    const zapytanie = `INSERT INTO Rozliczenie(idRachunek, kto_id, komu_id, idWaluta, kwota, data) VALUES (?, ?, ?, ?, ?, ?)`;
-    db.query(zapytanie, [req.params.idRachunek, req.body['kto_idCzlonek'], req.body['komu_idCzlonek'], req.body['idWaluta'], req.body['kwota'], req.body['data']], function(err, results) {
-        if(err){
-            console.error('Error in insertRozliczenie');
-            return res.status(500).send('Database error');
-        }
-        console.log(results);
+    else{
         next();
-    })
+    }
+}
+const deleteRozliczenie = function (req, res, next) {
+    if(req.authWrite) {
+        db.connect();
+        const zapytanie = `CALL usun_rozliczenie(?)`;
+        db.query(zapytanie, [req.params.idRozliczenie], function(err) {
+            if(err){
+                console.error('Error in deleteRozliczenie');
+                return res.status(500).send('Database error');
+            }
+            next();
+        })
+    }
+    else{
+        next();
+    }
 }
 
 router.use(logger);
@@ -266,22 +296,24 @@ router.param('idRachunek', authWrite);
 
 router.route('/:idRachunek/wydatki')
     .get(getWydatki, function(req, res) {
-        if (req.authRead) {
-            res.render('rachunekWydatki', {
-                authWrite: req.authWrite,
-                rachunek: req.rachunek,
-                wydatki: req.wydatki
-            });
-        }
-        else {
-            res.render('notfoundRachunek');
-        }
+        res.render('rachunekWydatki', {
+            user: req.user,
+            isAuthenticated: req.isAuthenticated(),
+            authRead: req.authRead,
+            authWrite: req.authWrite,
+            rachunek: req.rachunek,
+            wydatki: req.wydatki
+        });
+
 
     });
 
 router.route('/:idRachunek/nowy_wydatek')
     .get(getCzlonkowie, getWaluty, getRodzajePodzialu, function(req, res) {
         res.render('addWydatek', {
+            user: req.user,
+            isAuthenticated: req.isAuthenticated(),
+            authRead: req.authRead,
             authWrite: req.authWrite,
             rachunek: req.rachunek,
             czlonkowie: req.czlonkowie,
@@ -290,12 +322,20 @@ router.route('/:idRachunek/nowy_wydatek')
         });
     })
     .post(getCzlonkowie, insertWydatek, getWydatki, function(req, res) {
-        res.redirect('/rachunek/'+req.params.idRachunek+'/wydatki');
+        res.redirect('/rachunek/'+ req.params.idRachunek +'/wydatki');
     });
+
+router.route('/:idRachunek/usun_wydatek/:idWydatek')
+    .all(deleteWydatek, getCzlonkowie, getWydatki, function(req, res) {
+        res.redirect('/rachunek/' + req.params.idRachunek + '/wydatki');
+    })
 
 router.route('/:idRachunek/czlonkowie')
     .get(getCzlonkowie, getBilansWpisy, getBilansRozliczenia, function(req, res) {
        res.render('rachunekCzlonkowie', {
+           user: req.user,
+           isAuthenticated: req.isAuthenticated(),
+           authRead: req.authRead,
            authWrite: req.authWrite,
            rachunek: req.rachunek,
            czlonkowie: req.czlonkowie
@@ -304,7 +344,12 @@ router.route('/:idRachunek/czlonkowie')
 
 router.route('/:idRachunek/nowy_czlonek')
     .get(getCzlonkowie, function (req, res) {
-        res.render('addCzlonek', {authRead: req.authRead, authWrite: req.authWrite, rachunek: req.rachunek});
+        res.render('addCzlonek', {
+            user: req.user,
+            authRead: req.authRead,
+            authWrite: req.authWrite,
+            isAuthenticated: req.isAuthenticated(),
+            rachunek: req.rachunek});
     })
     .post(insertCzlonek, getCzlonkowie, getBilansWpisy, getBilansRozliczenia, function(req, res) {
         res.redirect('/rachunek/'+req.params.idRachunek+'/czlonkowie');
@@ -313,9 +358,11 @@ router.route('/:idRachunek/nowy_czlonek')
 router.route('/:idRachunek/rozliczenia')
     .get(getRozliczenia, function(req, res) {
         res.render('rachunekRozliczenia', {
+            user: req.user,
             rachunek: req.rachunek,
             authRead: req.authRead,
             authWrite: req.authWrite,
+            isAuthenticated: req.isAuthenticated(),
             czlonkowie: req.czlonkowie,
             rozliczenia: req.rozliczenia
         })
@@ -324,15 +371,22 @@ router.route('/:idRachunek/rozliczenia')
 router.route('/:idRachunek/nowe_rozliczenie')
     .get(getCzlonkowie, getWaluty, function (req, res) {
         res.render('addRozliczenie', {
+            user: req.user,
             rachunek: req.rachunek,
             authRead: req.authRead,
             authWrite: req.authWrite,
+            isAuthenticated: req.isAuthenticated(),
             czlonkowie: req.czlonkowie,
             waluty: req.waluty,
         })
     })
     .post(insertRozliczenie, getRozliczenia, function(req, res) {
         res.redirect('/rachunek/'+req.params.idRachunek+'/rozliczenia');
+    })
+
+router.route('/:idRachunek/usun_rozliczenie/:idRozliczenie')
+    .all(deleteRozliczenie, getRozliczenia, function (req, res) {
+        res.redirect('/rachunek/'+req.params.idRachunek+'/rozliczenia')
     })
 
 module.exports = router;

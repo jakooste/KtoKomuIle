@@ -15,17 +15,17 @@ const refreshPola = function () {
             label='';
             break;
         case '2':
-            input_mode = 'text';
+            input_mode = 'number';
             default_value = 5;
             label='%';
             break;
         case '3':
-            input_mode = 'text';
+            input_mode = 'number';
             default_value = 1;
             label='sztuki';
             break;
         default:
-            input_mode = 'text';
+            input_mode = 'number';
             default_value = 0;
             label = walutaSelectElement.options[walutaSelectElement.selectedIndex].text;
             break;
@@ -40,5 +40,6 @@ const refreshPola = function () {
 }
 
 rodzajSelectElement.addEventListener('change', refreshPola);
+rodzajSelectElement.addEventListener('click', refreshPola);
 walutaSelectElement.addEventListener('change', refreshPola);
-document.addEventListener('pageshow', refreshPola);
+addEventListener('load', refreshPola);

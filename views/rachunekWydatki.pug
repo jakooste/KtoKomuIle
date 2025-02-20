@@ -2,13 +2,20 @@ extends rachunek
 
 block karta
     h2 Lista wydatków:
-    if authWrite
-        a(href='/rachunek/' + rachunek.idRachunek + '/nowy_wydatek') <button>Nowy wydatek</button>
-    ul
+    ol.listaWpisow.container-fluid
+        if authWrite
+            li.row.align-items-center.rekord
+                a.addButton(href='/rachunek/' + rachunek.idRachunek + '/nowy_wydatek') +
         each wydatek in wydatki
-            li
-                div.rekord
-                    span= wydatek.wpis
-                    span= wydatek.kto
-                    span= wydatek.kwota + wydatek.waluta
-                    span= wydatek.kiedy.toDateString()
+            li.row.align-items-center.rekord
+                .col-sm
+                    div.pole= wydatek.wpis
+                .col-sm
+                    div.pole.username= wydatek.kto
+                .col-sm
+                    div.pole= wydatek.kwota + wydatek.waluta
+                .col-sm
+                    div.pole= wydatek.kiedy.toDateString()
+                if authWrite
+                    .col-sm-2
+                        a.deleteButton(href='/rachunek/' + rachunek.idRachunek + '/usun_wydatek/' + wydatek.idWpis) usuń

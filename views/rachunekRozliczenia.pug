@@ -1,14 +1,22 @@
 extends rachunek
 
 block karta
-    h2 Lista członków:
-    if authWrite
-        a(href='/rachunek/' + rachunek.idRachunek + '/nowe_rozliczenie') <button>Dodaj rozliczenie</button>
-    ul
+    h2 Lista rozliczeń:
+    ol.listaWpisow.container-fluid
+        if authWrite
+            li.row.align-items-center.rekord
+                a.addButton(href='/rachunek/' + rachunek.idRachunek + '/nowe_rozliczenie') +
         each rozliczenie in rozliczenia
-            div.rekord
-                span= rozliczenie.kto
-                span oddaje
-                span= rozliczenie.komu
-                span= rozliczenie.kwota + ' ' + rozliczenie.waluta
-                span= rozliczenie.data.toDateString()
+            li.row.align-items-center.rekord
+                .col-sm
+                    div.pole.username= rozliczenie.kto
+                .col-sm
+                    div.pole oddaje
+                .col-sm
+                    div.pole.username= rozliczenie.komu
+                .col-sm
+                    div.pole= rozliczenie.kwota + ' ' + rozliczenie.waluta
+                .col-sm
+                    div.pole= rozliczenie.data.toDateString()
+                .col-sm-2
+                    a.deleteButton(href='/rachunek/' + rachunek.idRachunek + '/usun_rozliczenie/' + rozliczenie.idRozliczenie) usuń

@@ -1,12 +1,15 @@
 extends layout
 
 block content
-    h1 Sign in
+    h1 Zaloguj się
     form(action='/login/password' method='post')
         section
-            label(for='username') Użytkownik
-            input(id='username' name='username' type='text' autocomplete='username' required autofocus)
-        section
-            label(for='current-password') Hasło
-            input(id='current-password' name='password' type='password' autocomplete='current-password' required)
+            div
+                label(for='username') Login:
+                input(id='username' name='username' type='text' autocomplete='username' required autofocus)
+            div
+                label(for='current-password') Hasło:
+                input(id='current-password' name='password' type='password' autocomplete='current-password' required)
         button(type='submit') Zaloguj
+        div
+            a(href='/signup') Nie masz konta? Utwórz je tutaj

@@ -1,8 +1,16 @@
 extends layout
 
 block content
-    h1 Rachunek: #{rachunek.nazwa}
-    a(href=('/rachunek/'+rachunek.idRachunek+'/wydatki')) <button>Wydatki</button>
-    a(href=('/rachunek/'+rachunek.idRachunek+'/czlonkowie')) <button>Czlonkowie</button>
-    a(href=('/rachunek/'+rachunek.idRachunek+'/rozliczenia')) <button>Rozliczenia</button>
-    block karta
+    +backbutton('/home', 'wróć do listy rachunków')
+    +checkRead
+        h1 Rachunek: #{rachunek.nazwa}
+        nav.container-fluid
+            div.row
+                div.col-sm
+                    a.navButton(href=('/rachunek/'+rachunek.idRachunek+'/wydatki')) Wydatki
+                div.col-sm
+                    a.navButton(href=('/rachunek/'+rachunek.idRachunek+'/czlonkowie')) Członkowie
+                div.col-sm
+                    a.navButton(href=('/rachunek/'+rachunek.idRachunek+'/rozliczenia')) Rozliczenia
+        div.karta
+            block karta

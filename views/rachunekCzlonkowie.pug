@@ -2,15 +2,17 @@ extends rachunek
 
 block karta
     h2 Lista członków:
-    if authWrite
-        a(href='/rachunek/' + rachunek.idRachunek + '/nowy_czlonek') <button>Dodaj członka</button>
-    ul
+    ol.listaWpisow.container-fluid
+        if authWrite
+            li.row.align-items-center.rekord
+                a.addButton(href='/rachunek/' + rachunek.idRachunek + '/nowy_czlonek') +
         each czlonek in czlonkowie
-            li
-                div.rekord
-                    p= czlonek.pseudonim
-                    p= czlonek.czyWirtualny ? 'wirtualny' : 'użytkownik'
-                    div
-                        each waluta in Object.entries(czlonek.bilans)
-                            if Math.abs(waluta[1]) > 0.01
-                                p= waluta[1].toFixed(2) + ' ' + waluta[0]
+            li.row.align-items-center.rekord
+                .col-sm
+                    div.pole.username= czlonek.pseudonim
+                .col-sm
+                    div.pole= czlonek.czyWirtualny ? 'wirtualny' : 'użytkownik'
+                each waluta in Object.entries(czlonek.bilans)
+                    if Math.abs(waluta[1]) > 0.01
+                        .col-sm
+                            div.pole(class=(waluta[1]>=0 ? 'kwotaPoz' : 'kwotaNeg'))=(waluta[1]>=0 ? 'należy się' : 'winien') + ' ' + waluta[1].toFixed(2) + ' ' + waluta[0]

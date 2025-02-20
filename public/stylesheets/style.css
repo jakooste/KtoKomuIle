@@ -1,54 +1,225 @@
+* {
+  --bg-color: #2A343C;
+  --bg-color-dark: color-mix(in lab, #2A343C, black 5%);
+  --bg-color-light: color-mix(in hsl, #2A343C, ghostwhite 5%);
+  --primary-color: #4b5e6c;
+  --text-color: #e5e4e2;
+  --acc-color-neg: #fb697b;
+  --acc-color-pos: #1cd653;
+  --acc-color-neu: #90bfe0;
+}
 body {
+  color: var(--text-color);
+  background-color: var(--bg-color);
   padding: 0;
   margin: 0;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
   display: flex;
   flex-direction: column;
-  height: 98vh;
+  height: 100vh;
   width: 100%;
   justify-content: space-between;
 }
-
 main {
   width: 100%;
   padding: 10px;
   margin: 0 auto;
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  align-items: center;
 }
-
-a {
-  color: #00B7FF;
+ul {
+  list-style: none;
 }
-
-.listaRachunkow > li {
-  color: darkslategray;
+ol {
+  list-style: none;
 }
-
 .header {
   width: 100%;
   margin: 0 auto;
-  background: chartreuse;
+  background: var(--primary-color);
   display: flex;
   flex-direction: row;
+  justify-content: stretch;
+  align-items: center;
+}
+.userwidget {
+  width: 10rem;
+  display: flex;
+  flex-direction: column;
   justify-content: center;
+  align-items: center;
+}
+.pagetitle {
+  margin: 0 auto;
+  width: auto;
+}
+.pagetitle a {
+  color: var(--text-color);
+  text-decoration: none;
+}
+.pagetitle a:hover {
+  text-decoration: underline;
 }
 .footer {
   width: 100%;
+  height: 5vh;
   margin: 0 auto;
-  background: chartreuse;
+  background: var(--primary-color);
   display: flex;
   flex-direction: row;
   justify-content: center;
+  align-items: center;
 }
-
-h1 > a {
-  color: black;
-  text-decoration: none;
-}
-
-h1 > a:hover {
-  text-decoration: underline;
-}
-
 form > div {
   margin: 1rem 0;
+}
+.rekord {
+  width: 50%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  background: lightgray;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+.listaRachunkow{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+.listaRachunkow > * {
+  display: block;
+  width: 10rem;
+  height: 10rem;
+  background: var(--primary-color);
+  margin: 1rem;
+}
+.listaRachunkow > *:hover {
+  background-color: color-mix(in hsl, var(--primary-color), white 20%);
+}
+.listaRachunkow a {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  color: var(--text-color);
+  text-align: center;
+  text-decoration: none;
+  font-size: x-large;
+  vertical-align: middle;
+  justify-content: center;
+  align-items: center;
+}
+h1 {
+  margin: 1rem;
+}
+.rachunekNav {
+}
+.navButton {
+  width: auto;
+  display: block;
+  line-height: 3.5rem;
+  font-size: x-large;
+  background: var(--primary-color);
+  color: var(--text-color);
+  text-decoration: none;
+  text-align: center;
+}
+.navButton:hover {
+  background-color: color-mix(in hsl, var(--primary-color), white 20%);
+  color: var(--text-color);
+  text-decoration: none;
+}
+.rekord {
+  width: 100%;
+  margin: 1rem 0;
+  padding: 0;
+  text-align: center;
+  background-color: color-mix(in hsl, var(--primary-color), var(--bg-color));
+}
+.rekord .pole {
+  padding: 1rem 0;
+}
+.rekord a {
+  width: 100%;
+  height: 100%;
+  padding: 1rem 0;
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  font-size: large;
+  vertical-align: middle;
+  margin: 0;
+  color: var(--text-color);
+  background-color: var(--primary-color);
+}
+.rekord a:hover {
+  background-color: color-mix(in hsl, var(--primary-color), white 20%);
+}
+.rekord a.deleteButton {
+  width: 100%;
+  height: 100%;
+  padding: 0.5rem;
+  background-color: color-mix(in srgb, var(--acc-color-neg), var(--bg-color) 50%);
+}
+.rekord a.deleteButton:hover {
+  background-color: color-mix(in srgb, var(--acc-color-neg), var(--bg-color) 10%);
+}
+.rekord .pole:first-child {
+  font-size: large;
+}
+.kwotaPoz {
+  color: var(--acc-color-pos);
+  font-weight: bold;
+}
+.kwotaNeg {
+  color: var(--acc-color-neg);
+  font-weight: bold;
+}
+.username {
+  font-weight: bold;
+}
+.karta {
+  width: 100%;
+  padding: 25px 0;
+  margin: 0 auto;
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  align-items: center;
+}
+form {
+  width: max-content;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+section {
+  width: 100%;
+  margin: 0 auto 1rem auto;
+}
+.pole_wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.pole_wrapper label {
+  display: block;
+}
+.podzial {
+  border: 2px solid var(--primary-color);
+}
+label {
+  margin: 0 1rem 0 0;
+}
+input[type='number'] {
+  width: 6rem;
+}
+button {
+  padding: 0.3rem 0.5rem;
 }

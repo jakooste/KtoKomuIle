@@ -1,10 +1,29 @@
+mixin backbutton(href, text)
+  a.backButton(href=href)= '< ' + text
+
+mixin checkRead()
+  if authRead
+    block
+  else
+    h1 Ups!
+    h3 Docelowy rachunek nie istnieje lub nie masz do niego dostępu
+
+mixin checkWrite()
+  if authWrite
+    block
+  else
+    h1 Brak dostępu
+    h3 Nie możesz modyfikować tego rachunku. Skontaktuj się z jego twórcą
+
 doctype html
 html
   head
     title KtoKomuIle
+    link(rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous")
     link(rel='stylesheet', href='/stylesheets/style.css')
   body
     include components/header
     main
       block content
     include components/footer
+

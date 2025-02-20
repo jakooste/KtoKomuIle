@@ -1,12 +1,12 @@
 extends layout
 
 block content
-    h1 Witaj w serwisie KtoKomuIle, #{user.username}!
+    h1 Witaj w serwisie KtoKomuIle, <span class='username'>#{user.username}</span>!
     h2 Lista twoich rachunków:
-    ul
+    div.listaRachunkow
         each rachunek in rachunki
-            li <a href='/rachunek/#{rachunek.idRachunek}/wydatki'>#{rachunek.nazwa}</a>
-    div
-        a(href='/home/new') <button>Dodaj nowy rachunek</button>
-    div
-        include components/logoutButton
+            div
+                a(href='/rachunek/' + rachunek.idRachunek + '/wydatki')
+                    p=rachunek.nazwa
+        div
+            a(href='/home/new') +

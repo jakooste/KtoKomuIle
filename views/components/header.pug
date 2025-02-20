@@ -1,2 +1,8 @@
 div.header
-    h1 <a href="/"> KtoKomuIle </a>
+    if isAuthenticated
+        div.userwidget
+            div zalogowano jako:
+            div.username= user.username
+            include logoutButton
+    div.pagetitle
+        h1 <a href="/"> KtoKomuIle </a>

@@ -2,12 +2,11 @@ const express = require('express');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const crypto = require('crypto');
-const mysql = require('mysql2');
 const router = express.Router();
 const db = require('../db');
 
 
-router.get('/login', function(req, res, next){
+router.get('/login', function(req, res){
     res.render('login');
 })
 
@@ -18,7 +17,7 @@ router.post('/logout', function(req, res, next){
     });
 });
 
-router.get('/signup', function (req, res, next){
+router.get('/signup', function (req, res){
     res.render('signup');
 });
 
@@ -26,14 +25,16 @@ router.post('/signup', function(req, res, next){
     const salt = crypto.randomBytes(16);
     crypto.pbkdf2(req.body.password, salt, 310000, 32, 'sha256', function(err, hashedPassword) {
         if(err) {return next(err);}
-        db.query('INSERT INTO Uzytkownik (login, hashed_password, salt) VALUES (?,?,?)', [
+        db.query('INSERT INTO Uzytkownik (login, hashed_password, salt, email) VALUES (?,?,?,?)', [
             req.body.username,
             hashedPassword,
-            salt
-        ], function (err) {
+            salt,
+            req.body.email
+        ], function (err, results) {
             if (err) {return next(err);}
-            var user = {
-                id: this.lastID,
+            console.log(results);
+            const user = {
+                id: results.insertId,
                 username: req.body.username,
             };
             req.login(user, function(err) {
